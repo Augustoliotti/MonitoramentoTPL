@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgroFleet Commander | Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+    <script src="components/navbar.js"></script>
+    <script src="components/sidebar.js"></script>
+</head>
+<body class="bg-gray-50">
+    <custom-navbar></custom-navbar>
+    <div class="flex">
+        <custom-sidebar></custom-sidebar>
+        
+        <main class="flex-1 p-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <div class="bg-white rounded-lg shadow p-6">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-lg font-medium text-gray-700">Frota</h3>
+                        <i data-feather="truck" class="text-green-500"></i>
+                    </div>
+                    <p class="text-2xl font-bold mt-2">24</p>
+                    <a href="frota.html" class="text-green-500 hover:text-green-600 text-sm flex items-center mt-4">
+                        Ver todos <i data-feather="chevron-right" class="w-4 h-4 ml-1"></i>
+                    </a>
+                </div>
+                
+                <div class="bg-white rounded-lg shadow p-6">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-lg font-medium text-gray-700">Operações</h3>
+                        <i data-feather="activity" class="text-blue-500"></i>
+                    </div>
+                    <p class="text-2xl font-bold mt-2">15</p>
+                    <a href="operacoes.html" class="text-blue-500 hover:text-blue-600 text-sm flex items-center mt-4">
+                        Ver todas <i data-feather="chevron-right" class="w-4 h-4 ml-1"></i>
+                    </a>
+                </div>
+                
+                <div class="bg-white rounded-lg shadow p-6">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-lg font-medium text-gray-700">Grupos/Frentes</h3>
+                        <i data-feather="users" class="text-purple-500"></i>
+                    </div>
+                    <p class="text-2xl font-bold mt-2">8</p>
+                    <a href="grupos.html" class="text-purple-500 hover:text-purple-600 text-sm flex items-center mt-4">
+                        Ver todos <i data-feather="chevron-right" class="w-4 h-4 ml-1"></i>
+                    </a>
+                </div>
+                
+                <div class="bg-white rounded-lg shadow p-6">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-lg font-medium text-gray-700">O.S.</h3>
+                        <i data-feather="file-text" class="text-orange-500"></i>
+                    </div>
+                    <p class="text-2xl font-bold mt-2">32</p>
+                    <a href="ordens.html" class="text-orange-500 hover:text-orange-600 text-sm flex items-center mt-4">
+                        Ver todas <i data-feather="chevron-right" class="w-4 h-4 ml-1"></i>
+                    </a>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-xl font-semibold text-gray-800">Atividades Recentes</h2>
+                    <a href="#" class="text-sm text-gray-500 hover:text-gray-700">Ver tudo</a>
+                </div>
+                
+                <div class="space-y-4">
+                    <div class="flex items-start p-4 hover:bg-gray-50 rounded-lg transition">
+                        <div class="bg-green-100 p-2 rounded-full mr-4">
+                            <i data-feather="check-circle" class="text-green-500"></i>
+                        </div>
+                        <div class="flex-1">
+                            <p class="font-medium">OS #1245 concluída</p>
+                            <p class="text-sm text-gray-500">Plantio de soja - Fazenda Santa Maria</p>
+                        </div>
+                        <span class="text-sm text-gray-400">2h atrás</span>
+                    </div>
+                    
+                    <div class="flex items-start p-4 hover:bg-gray-50 rounded-lg transition">
+                        <div class="bg-blue-100 p-2 rounded-full mr-4">
+                            <i data-feather="alert-circle" class="text-blue-500"></i>
+                        </div>
+                        <div class="flex-1">
+                            <p class="font-medium">Manutenção necessária</p>
+                            <p class="text-sm text-gray-500">Trator John Deere 8320R</p>
+                        </div>
+                        <span class="text-sm text-gray-400">5h atrás</span>
+                    </div>
+                    
+                    <div class="flex items-start p-4 hover:bg-gray-50 rounded-lg transition">
+                        <div class="bg-purple-100 p-2 rounded-full mr-4">
+                            <i data-feather="user-plus" class="text-purple-500"></i>
+                        </div>
+                        <div class="flex-1">
+                            <p class="font-medium">Novo grupo criado</p>
+                            <p class="text-sm text-gray-500">Frente Oeste - 5 operadores</p>
+                        </div>
+                        <span class="text-sm text-gray-400">Ontem</span>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script>
+        feather.replace();
+    </script>
+    <script src="script.js"></script>
+</body>
+</html>
