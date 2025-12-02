@@ -1,79 +1,61 @@
 class CustomSidebar extends HTMLElement {
   connectedCallback() {
-    this.attachShadow({ mode: 'open' });
-    this.shadowRoot.innerHTML = `
-      <style>
-        .sidebar {
-          width: 250px;
-          transition: transform 0.3s ease;
-        }
-        .sidebar-link {
-          transition: all 0.2s ease;
-        }
-        .sidebar-link:hover {
-          background-color: rgba(16, 185, 129, 0.1);
-        }
-        .sidebar-link.active {
-          background-color: rgba(16, 185, 129, 0.1);
-          border-left: 3px solid #10b981;
-          color: #10b981;
-        }
-        @media (max-width: 768px) {
-          .sidebar {
-            transform: translateX(-100%);
-            position: fixed;
-            height: calc(100vh - 64px);
-            top: 64px;
-            z-index: 10;
-          }
-          .sidebar.open {
-            transform: translateX(0);
-          }
-        }
-      </style>
-      <div class="sidebar bg-white h-screen fixed lg:static shadow-sm flex-shrink-0">
-        <div class="p-4">
-          <div class="space-y-1">
-            <a href="index.html" class="sidebar-link flex items-center px-4 py-3 rounded-lg text-gray-700">
-              <i data-feather="home" class="mr-3"></i>
-              Dashboard
-            </a>
-            
-            <a href="frota.html" class="sidebar-link flex items-center px-4 py-3 rounded-lg text-gray-700">
-              <i data-feather="truck" class="mr-3"></i>
-              Frota
-            </a>
-            
-            <a href="operacoes.html" class="sidebar-link flex items-center px-4 py-3 rounded-lg text-gray-700">
-              <i data-feather="activity" class="mr-3"></i>
-              Operações
-            </a>
-            
-            <a href="grupos.html" class="sidebar-link flex items-center px-4 py-3 rounded-lg text-gray-700">
-              <i data-feather="users" class="mr-3"></i>
-              Grupos/Frentes
-            </a>
-            
-            <a href="ordens.html" class="sidebar-link flex items-center px-4 py-3 rounded-lg text-gray-700">
-              <i data-feather="file-text" class="mr-3"></i>
-              O.S.
-            </a>
-            
-            <div class="pt-4 mt-4 border-t border-gray-200">
-              <a href="#" class="sidebar-link flex items-center px-4 py-3 rounded-lg text-gray-700">
-                <i data-feather="settings" class="mr-3"></i>
-                Configurações
-              </a>
-              
-              <a href="#" class="sidebar-link flex items-center px-4 py-3 rounded-lg text-gray-700">
-                <i data-feather="help-circle" class="mr-3"></i>
-                Ajuda
-              </a>
+    // Detecta a página atual para marcar o link ativo
+    const currentPath = window.location.pathname;
+    const isActive = (path) => currentPath.includes(path) ? 'bg-emerald-50 text-emerald-700 border-r-4 border-emerald-500 font-semibold' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900 transition-colors';
+    
+    this.innerHTML = `
+      <aside class="w-64 bg-white h-full flex flex-col border-r border-slate-200 flex-shrink-0 z-30 hidden md:flex transition-all duration-300">
+        
+        <div class="h-16 flex items-center px-6 border-b border-slate-100">
+          <div class="flex items-center gap-2 text-emerald-600">
+            <i data-feather="box" class="w-6 h-6 fill-current"></i>
+            <span class="text-lg font-bold text-slate-800 tracking-tight">AgroFleet</span>
+          </div>
+        </div>
+
+        <nav class="flex-1 overflow-y-auto py-6 px-3 space-y-1">
+          
+          <div class="px-3 mb-2 text-xs font-bold text-slate-400 uppercase tracking-wider">Principal</div>
+          
+          <a href="index.html" class="flex items-center gap-3 px-3 py-2.5 text-sm rounded-lg ${isActive('index.html')}">
+            <i data-feather="pie-chart" class="w-5 h-5"></i>
+            Dashboard
+          </a>
+          
+          <a href="frota.html" class="flex items-center gap-3 px-3 py-2.5 text-sm rounded-lg ${isActive('frota.html')}">
+            <i data-feather="truck" class="w-5 h-5"></i>
+            Diário de Operações
+          </a>
+
+          <div class="px-3 mb-2 mt-6 text-xs font-bold text-slate-400 uppercase tracking-wider">Gerenciamento</div>
+
+          <a href="equipes.html" class="flex items-center gap-3 px-3 py-2.5 text-sm rounded-lg ${isActive('equipes.html')}">
+            <i data-feather="users" class="w-5 h-5"></i>
+            Equipes
+          </a>
+          
+          <a href="configuracoes.html" class="flex items-center gap-3 px-3 py-2.5 text-sm rounded-lg ${isActive('configuracoes.html')}">
+            <i data-feather="settings" class="w-5 h-5"></i>
+            Configurações
+          </a>
+        </nav>
+
+        <div class="p-4 border-t border-slate-100">
+          <div class="bg-slate-50 rounded-lg p-3 border border-slate-100 flex items-center gap-3">
+            <div class="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-700 font-bold text-xs">
+              AD
+            </div>
+            <div class="overflow-hidden">
+              <p class="text-xs font-bold text-slate-700 truncate">Admin User</p>
+              <p class="text-[10px] text-slate-400 truncate">admin@agrofleet.com</p>
             </div>
           </div>
         </div>
-      </div>
+      </aside>
     `;
+    
+    if (typeof feather !== 'undefined') feather.replace();
   }
 }
 customElements.define('custom-sidebar', CustomSidebar);

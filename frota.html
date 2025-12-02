@@ -3,134 +3,149 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AgroFleet Commander | Frota</title>
+    <title>AgroFleet | Diário de Operações</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
-    <script src="https://unpkg.com/feather-icons"></script>
     <script src="components/navbar.js"></script>
     <script src="components/sidebar.js"></script>
 </head>
-<body class="bg-gray-50">
-    <custom-navbar></custom-navbar>
-    <div class="flex">
-        <custom-sidebar></custom-sidebar>
+<body class="flex h-screen overflow-hidden bg-slate-50">
+    <custom-sidebar class="z-20"></custom-sidebar>
+
+    <div class="flex-1 flex flex-col h-full relative">
+        <custom-navbar class="z-10"></custom-navbar>
         
-        <main class="flex-1 p-8">
-            <div class="flex justify-between items-center mb-8">
-                <h1 class="text-2xl font-bold text-gray-800">Frota de Tratores</h1>
-                <button class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg flex items-center">
-                    <i data-feather="plus" class="mr-2"></i> Adicionar Trator
-                </button>
+        <main class="flex-1 p-6 flex flex-col h-full overflow-hidden">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+                <div>
+                    <h1 class="text-2xl font-bold text-slate-800 flex items-center gap-2">
+                        <i data-feather="calendar" class="text-emerald-600 w-6 h-6"></i>
+                        Diário de Operações
+                    </h1>
+                    <p class="text-slate-500 text-sm mt-1">Gerencie os apontamentos diários.</p>
+                </div>
+                
+                <div class="flex items-center gap-3 bg-white p-2 rounded-lg border border-slate-200 shadow-sm">
+                    <div class="relative group">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <span class="text-xs font-bold text-slate-400">DATA</span>
+                        </div>
+                        <input type="date" id="input-data-selecionada" class="pl-12 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-md text-sm font-bold text-slate-700 focus:ring-2 focus:ring-emerald-500 outline-none cursor-pointer">
+                    </div>
+                    <div class="h-6 w-px bg-slate-200 mx-1"></div>
+                    <button onclick="exportarExcel()" class="btn-modern btn-secondary text-xs h-9" title="Exportar Dia"><i data-feather="download" class="w-4 h-4"></i><span class="hidden sm:inline">Excel</span></button>
+                    <button onclick="baixarBackupCompleto()" class="btn-modern btn-primary text-xs h-9" title="Backup Completo"><i data-feather="database" class="w-4 h-4"></i><span class="hidden sm:inline">Backup</span></button>
+                </div>
             </div>
             
-            <div class="bg-white rounded-lg shadow overflow-hidden">
-                <div class="p-4 border-b flex justify-between items-center">
-                    <div class="relative w-64">
-                        <i data-feather="search" class="absolute left-3 top-3 text-gray-400"></i>
-                        <input type="text" placeholder="Buscar trator..." class="pl-10 pr-4 py-2 w-full border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+            <div class="table-container flex-1 flex flex-col bg-white rounded-xl shadow-sm border border-slate-200">
+                <div class="p-4 border-b border-slate-100 flex justify-between items-center bg-white rounded-t-xl">
+                    <div class="relative w-full max-w-md">
+                        <i data-feather="search" class="absolute left-3 top-3 text-slate-400 w-4 h-4"></i>
+                        <input type="text" id="search-input" placeholder="Buscar equipamento, fazenda..." class="input-modern pl-10 border-slate-200">
                     </div>
-                    <div class="flex space-x-2">
-                        <button class="p-2 rounded-lg border hover:bg-gray-50">
-                            <i data-feather="filter"></i>
-                        </button>
-                        <button class="p-2 rounded-lg border hover:bg-gray-50">
-                            <i data-feather="download"></i>
-                        </button>
+                    <div class="text-xs font-medium text-slate-500 bg-slate-50 px-3 py-1.5 rounded-full border border-slate-100">
+                        Total: <span id="table-count" class="text-slate-800 font-bold">0</span>
                     </div>
                 </div>
-                
-                <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
+                <div class="flex-1 overflow-auto">
+                    <table class="table-modern w-full">
+                        <thead>
                             <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Modelo</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Marca</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ano</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Horímetro</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
+                                <th width="90">Equip</th>
+                                <th width="80" class="text-center">Cód.Op</th>
+                                <th>Operação</th>
+                                <th width="100">Fundo</th>
+                                <th>Fazenda</th>
+                                <th width="100">O.S.</th>
+                                <th>Manutenção/Obs</th>
+                                <th width="70" class="text-center">Ação</th>
                             </tr>
                         </thead>
-                        <tbody class="bg-white divide-y divide-gray-200">
-                            <tr class="hover:bg-gray-50">
-                                <td class="px-6 py-4 whitespace-nowrap">8320R</td>
-                                <td class="px-6 py-4 whitespace-nowrap">John Deere</td>
-                                <td class="px-6 py-4 whitespace-nowrap">2021</td>
-                                <td class="px-6 py-4 whitespace-nowrap">1.245h</td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">Ativo</span>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <button class="text-blue-500 hover:text-blue-700 mr-3">
-                                        <i data-feather="edit"></i>
-                                    </button>
-                                    <button class="text-red-500 hover:text-red-700">
-                                        <i data-feather="trash-2"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                            <tr class="hover:bg-gray-50">
-                                <td class="px-6 py-4 whitespace-nowrap">Magnum 340</td>
-                                <td class="px-6 py-4 whitespace-nowrap">Case IH</td>
-                                <td class="px-6 py-4 whitespace-nowrap">2020</td>
-                                <td class="px-6 py-4 whitespace-nowrap">2.780h</td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-800">Manutenção</span>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <button class="text-blue-500 hover:text-blue-700 mr-3">
-                                        <i data-feather="edit"></i>
-                                    </button>
-                                    <button class="text-red-500 hover:text-red-700">
-                                        <i data-feather="trash-2"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                            <tr class="hover:bg-gray-50">
-                                <td class="px-6 py-4 whitespace-nowrap">S670</td>
-                                <td class="px-6 py-4 whitespace-nowrap">John Deere</td>
-                                <td class="px-6 py-4 whitespace-nowrap">2019</td>
-                                <td class="px-6 py-4 whitespace-nowrap">3.450h</td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">Ativo</span>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <button class="text-blue-500 hover:text-blue-700 mr-3">
-                                        <i data-feather="edit"></i>
-                                    </button>
-                                    <button class="text-red-500 hover:text-red-700">
-                                        <i data-feather="trash-2"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                        </tbody>
+                        <tbody id="frota-table-body"></tbody>
                     </table>
-                </div>
-                
-                <div class="px-6 py-4 border-t flex items-center justify-between">
-                    <div class="text-sm text-gray-500">
-                        Mostrando <span class="font-medium">1</span> a <span class="font-medium">3</span> de <span class="font-medium">24</span> resultados
-                    </div>
-                    <div class="flex space-x-2">
-                        <button class="px-3 py-1 border rounded-lg hover:bg-gray-50">
-                            <i data-feather="chevron-left"></i>
-                        </button>
-                        <button class="px-3 py-1 border rounded-lg bg-gray-100">1</button>
-                        <button class="px-3 py-1 border rounded-lg hover:bg-gray-50">2</button>
-                        <button class="px-3 py-1 border rounded-lg hover:bg-gray-50">3</button>
-                        <button class="px-3 py-1 border rounded-lg hover:bg-gray-50">
-                            <i data-feather="chevron-right"></i>
-                        </button>
-                    </div>
                 </div>
             </div>
         </main>
     </div>
+
+    <div id="modal-atualizacao" class="modal">
+        <div class="modal-content">
+            <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50 rounded-t-lg">
+                <div>
+                    <h3 class="text-lg font-bold text-slate-800">Apontamento Diário</h3>
+                    <p class="text-xs text-slate-500">Atualize os dados da operação</p>
+                </div>
+                <button onclick="fecharModal()" class="text-slate-400 hover:text-red-500 transition p-1 rounded-full hover:bg-red-50"><i data-feather="x" class="w-5 h-5"></i></button>
+            </div>
+            
+            <form id="form-atualizacao" onsubmit="salvarAtualizacao(event)" class="p-6 space-y-6">
+                <div class="flex items-center justify-between p-4 bg-emerald-50 border border-emerald-100 rounded-lg">
+                    <div class="flex items-center gap-4">
+                        <div class="bg-white p-3 rounded-full shadow-sm"><i data-feather="truck" class="text-emerald-600 w-6 h-6"></i></div>
+                        <div>
+                            <p class="text-xs font-bold text-emerald-600 uppercase tracking-wider">Equipamento</p>
+                            <input id="input-equipamento" type="text" readonly class="bg-transparent text-3xl font-bold text-slate-800 w-full outline-none border-none p-0">
+                        </div>
+                    </div>
+                    <div class="hidden md:block"><span class="px-3 py-1 bg-white text-emerald-700 text-xs font-bold rounded-full border border-emerald-200 shadow-sm uppercase">Ativo</span></div>
+                </div>
+
+                <div class="space-y-5">
+                    
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 mb-1.5 uppercase">Operação Realizada</label>
+                        <div class="relative">
+                            <i data-feather="activity" class="absolute left-3 top-3 text-slate-400 w-4 h-4"></i>
+                            <input id="input-operacao" type="text" list="lista-operacoes" class="input-modern pl-10" placeholder="Selecione ou digite a operação...">
+                            <datalist id="lista-operacoes"></datalist>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col md:flex-row gap-4">
+                        <div class="w-full md:w-1/3">
+                            <label class="block text-xs font-bold text-slate-500 mb-1.5 uppercase">Fundo Agrícola</label>
+                            <div class="relative">
+                                <i data-feather="map" class="absolute left-3 top-3 text-slate-400 w-4 h-4"></i>
+                                <input id="input-fundo" type="text" list="lista-fundos-sugestao" class="input-modern pl-10 font-medium text-slate-700" placeholder="Cód.">
+                                <datalist id="lista-fundos-sugestao"></datalist>
+                            </div>
+                        </div>
+                        <div class="w-full md:w-2/3">
+                            <label class="block text-xs font-bold text-slate-500 mb-1.5 uppercase">Fazenda</label>
+                            <input id="input-fazenda" type="text" readonly class="input-modern bg-slate-100 text-slate-500 border-slate-200 cursor-not-allowed border-dashed">
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col md:flex-row gap-4">
+                        <div class="w-full md:w-1/3">
+                            <label class="block text-xs font-bold text-blue-600 mb-1.5 uppercase">Nº O.S.</label>
+                            <input id="input-os" type="text" 
+                                class="input-modern font-mono text-lg font-black text-blue-700 placeholder-blue-300 border-blue-200 focus:ring-blue-500 focus:border-blue-500" 
+                                placeholder="0000">
+                        </div>
+                        <div class="w-full md:w-2/3">
+                            <label class="block text-xs font-bold text-red-500 mb-1.5 uppercase">Manutenção / Observação</label>
+                            <div class="relative">
+                                <i data-feather="alert-circle" class="absolute left-3 top-3 text-red-400 w-4 h-4"></i>
+                                <input id="input-manutencao" type="text" 
+                                    class="input-modern pl-10 font-bold text-red-700 bg-red-50 border-red-200 focus:border-red-500 focus:ring-red-200 placeholder-red-300" 
+                                    placeholder="Descreva problemas...">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pt-5 border-t border-slate-100 flex justify-end gap-3">
+                    <button type="button" onclick="fecharModal()" class="btn-modern btn-secondary text-sm">Cancelar</button>
+                    <button type="submit" class="btn-modern btn-primary px-6 text-sm shadow-lg shadow-emerald-200">Confirmar Apontamento</button>
+                </div>
+            </form>
+        </div>
+    </div>
     
-    <script>
-        feather.replace();
-    </script>
     <script src="script.js"></script>
+    <script>feather.replace()</script>
 </body>
 </html>
