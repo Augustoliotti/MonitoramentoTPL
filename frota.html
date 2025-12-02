@@ -23,7 +23,7 @@
                         <i data-feather="calendar" class="text-emerald-600 w-6 h-6"></i>
                         Diário de Operações
                     </h1>
-                    <p class="text-slate-500 text-sm mt-1">Gerencie os apontamentos diários.</p>
+                    <p class="text-slate-500 text-sm mt-1">Gerencie os apontamentos diários (Online).</p>
                 </div>
                 
                 <div class="flex items-center gap-3 bg-white p-2 rounded-lg border border-slate-200 shadow-sm">
@@ -35,8 +35,7 @@
                     </div>
                     <div class="h-6 w-px bg-slate-200 mx-1"></div>
                     <button onclick="exportarExcel()" class="btn-modern btn-secondary text-xs h-9" title="Exportar Dia"><i data-feather="download" class="w-4 h-4"></i><span class="hidden sm:inline">Excel</span></button>
-                    <button onclick="baixarBackupCompleto()" class="btn-modern btn-primary text-xs h-9" title="Backup Completo"><i data-feather="database" class="w-4 h-4"></i><span class="hidden sm:inline">Backup</span></button>
-                </div>
+                    </div>
             </div>
             
             <div class="table-container flex-1 flex flex-col bg-white rounded-xl shadow-sm border border-slate-200">
@@ -58,6 +57,7 @@
                                 <th>Operação</th>
                                 <th width="100">Fundo</th>
                                 <th>Fazenda</th>
+                                <th>Implemento</th>
                                 <th width="100">O.S.</th>
                                 <th>Manutenção/Obs</th>
                                 <th width="70" class="text-center">Ação</th>
@@ -80,7 +80,7 @@
                 <button onclick="fecharModal()" class="text-slate-400 hover:text-red-500 transition p-1 rounded-full hover:bg-red-50"><i data-feather="x" class="w-5 h-5"></i></button>
             </div>
             
-            <form id="form-atualizacao" onsubmit="salvarAtualizacao(event)" class="p-6 space-y-6">
+            <form id="form-atualizacao" class="p-6 space-y-6">
                 <div class="flex items-center justify-between p-4 bg-emerald-50 border border-emerald-100 rounded-lg">
                     <div class="flex items-center gap-4">
                         <div class="bg-white p-3 rounded-full shadow-sm"><i data-feather="truck" class="text-emerald-600 w-6 h-6"></i></div>
@@ -93,13 +93,21 @@
                 </div>
 
                 <div class="space-y-5">
-                    
-                    <div>
-                        <label class="block text-xs font-bold text-slate-500 mb-1.5 uppercase">Operação Realizada</label>
-                        <div class="relative">
-                            <i data-feather="activity" class="absolute left-3 top-3 text-slate-400 w-4 h-4"></i>
-                            <input id="input-operacao" type="text" list="lista-operacoes" class="input-modern pl-10" placeholder="Selecione ou digite a operação...">
-                            <datalist id="lista-operacoes"></datalist>
+                    <div class="flex flex-col md:flex-row gap-4">
+                        <div class="w-full md:w-1/2">
+                            <label class="block text-xs font-bold text-slate-500 mb-1.5 uppercase">Operação</label>
+                            <div class="relative">
+                                <i data-feather="activity" class="absolute left-3 top-3 text-slate-400 w-4 h-4"></i>
+                                <input id="input-operacao" type="text" list="lista-operacoes" class="input-modern pl-10" placeholder="Selecione...">
+                                <datalist id="lista-operacoes"></datalist>
+                            </div>
+                        </div>
+                        <div class="w-full md:w-1/2">
+                            <label class="block text-xs font-bold text-slate-500 mb-1.5 uppercase">Implemento</label>
+                            <div class="relative">
+                                <i data-feather="tool" class="absolute left-3 top-3 text-slate-400 w-4 h-4"></i>
+                                <input id="input-implemento" type="text" class="input-modern pl-10" placeholder="Ex: Grade 12 discos...">
+                            </div>
                         </div>
                     </div>
 
@@ -145,7 +153,7 @@
         </div>
     </div>
     
-    <script src="script.js"></script>
+    <script type="module" src="script.js"></script>
     <script>feather.replace()</script>
 </body>
 </html>

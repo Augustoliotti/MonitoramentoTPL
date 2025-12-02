@@ -1,3 +1,21 @@
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+// --- CONFIGURAÇÃO DO FIREBASE (Sua Chave Real) ---
+const firebaseConfig = {
+  apiKey: "AIzaSyD9M4nTZjQcKPDNGNh4RJyBomQeOyGb0yM",
+  authDomain: "monitoramentotpl-17aa3.firebaseapp.com",
+  projectId: "monitoramentotpl-17aa3",
+  storageBucket: "monitoramentotpl-17aa3.firebasestorage.app",
+  messagingSenderId: "418904686486",
+  appId: "1:418904686486:web:6e0a679546ef81887ae7b7",
+  measurementId: "G-21QGLJV6MD"
+};
+
+// Inicializa Firebase
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
 // --- 1. BASE DE DADOS FIXA ---
 const baseFixa = [
     { id: "11116", codigo: "3019" }, { id: "11118", codigo: "3005" }, { id: "11121", codigo: "1013" },
@@ -54,61 +72,77 @@ const mapaOperacoes = {
     "Destruição De Soqueira Sph": "1019", "Manutencao Oficina": "3009", "Aguardando Ordem": "3005"
 };
 
-// --- 3. GESTÃO DE DADOS ---
-let dbDiario = {}; 
+// --- 3. GESTÃO DE DADOS (FIREBASE) ---
+let dadosDiaAtual = {}; 
 let dataSelecionada = ""; 
-
-function carregarDadosSalvos() {
-    const dadosSalvos = localStorage.getItem('agroFleetData');
-    if (dadosSalvos) {
-        try { dbDiario = JSON.parse(dadosSalvos); } 
-        catch (e) { dbDiario = {}; }
-    }
-}
-
-function salvarDadosNoNavegador() {
-    localStorage.setItem('agroFleetData', JSON.stringify(dbDiario));
-}
+let unsubscribe = null; 
 
 document.addEventListener('DOMContentLoaded', function() {
     if (typeof feather !== 'undefined') feather.replace();
-    carregarDadosSalvos();
 
     const inputData = document.getElementById('input-data-selecionada');
+    
+    // Define data inicial
+    const hoje = new Date().toISOString().split('T')[0];
+    const ultimaData = localStorage.getItem('ultimaDataSelecionada');
+    dataSelecionada = ultimaData || hoje;
+    
     if (inputData) {
-        const hoje = new Date().toISOString().split('T')[0];
-        inputData.value = localStorage.getItem('ultimaDataSelecionada') || hoje;
-        dataSelecionada = inputData.value;
-        
+        inputData.value = dataSelecionada;
         inputData.addEventListener('change', function(e) {
             dataSelecionada = e.target.value;
             localStorage.setItem('ultimaDataSelecionada', dataSelecionada);
-            renderFrotaTable();
-            updateDashboard();
+            carregarDadosFirebase(); 
         });
     }
 
-    if (document.getElementById('frota-table-body')) {
-        renderFrotaTable();
-        setupSearch();
-        setupAutoFill(); 
-        popularDatalists();
-    }
+    // Configura botões e selects
+    setupAutoFill(); 
+    popularDatalists();
+    setupSearch();
     
-    if (document.getElementById('total-frota')) updateDashboard();
+    // Listener para o formulário
+    const form = document.getElementById('form-atualizacao');
+    if(form) form.addEventListener('submit', salvarAtualizacao);
+    
+    // Torna funções acessíveis globalmente
+    window.fecharModal = fecharModal;
+    window.abrirAtualizacao = abrirAtualizacao;
+    window.exportarExcel = exportarExcel;
+    
+    // Carrega dados iniciais
+    carregarDadosFirebase();
 });
 
-// --- RENDERIZAR TABELA (VISUAL AJUSTADO) ---
+// --- FUNÇÃO PARA CARREGAR DADOS DO FIREBASE EM TEMPO REAL ---
+function carregarDadosFirebase() {
+    if (unsubscribe) {
+        unsubscribe();
+    }
+
+    const docRef = doc(db, "diario_frota", dataSelecionada);
+
+    unsubscribe = onSnapshot(docRef, (docSnap) => {
+        if (docSnap.exists()) {
+            dadosDiaAtual = docSnap.data();
+        } else {
+            dadosDiaAtual = {}; 
+        }
+        renderFrotaTable();
+        updateDashboard();
+    }, (error) => {
+        console.error("Erro ao ler dados:", error);
+    });
+}
+
 function renderFrotaTable(filtro = "") {
     const tbody = document.getElementById('frota-table-body');
     if (!tbody) return;
     tbody.innerHTML = ''; 
 
-    const registrosDoDia = dbDiario[dataSelecionada] || {};
-
     baseFixa.forEach(itemBase => {
-        const dadosOp = registrosDoDia[itemBase.id] || { 
-            operacao: "", codigo: itemBase.codigo, os: "", manutencao: "", fundo: "", fazenda: "" 
+        const dadosOp = dadosDiaAtual[itemBase.id] || { 
+            operacao: "", codigo: itemBase.codigo, os: "", manutencao: "", fundo: "", fazenda: "", implemento: "" 
         };
 
         const textoBusca = (itemBase.id + dadosOp.fazenda + dadosOp.operacao).toLowerCase();
@@ -132,15 +166,20 @@ function renderFrotaTable(filtro = "") {
             <td>
                 ${dadosOp.operacao ? `<span class="${statusClass}">${dadosOp.operacao}</span>` : '<span class="text-slate-300">--</span>'}
             </td>
-            <td class="text-slate-600 font-medium">${dadosOp.fundo || ''}</td>
-            <td class="text-slate-500 text-xs">${dadosOp.fazenda || ''}</td>
             
-            <td style="color: #1d4ed8; font-weight: 800; font-family: monospace; font-size: 0.95rem;">
-                ${dadosOp.os || ''}
+            <td class="text-slate-700 font-bold">${dadosOp.fundo || ''}</td>
+            <td class="text-slate-700 font-bold text-xs">${dadosOp.fazenda || ''}</td>
+            
+            <td>
+                ${dadosOp.implemento ? `<span class="badge bg-blue-100 text-blue-800">${dadosOp.implemento}</span>` : ''}
+            </td>
+
+            <td>
+                ${dadosOp.os ? `<span class="badge bg-blue-100 text-blue-800">${dadosOp.os}</span>` : ''}
             </td>
             
-            <td style="color: #dc2626; font-weight: 600; font-size: 0.85rem;" title="${dadosOp.manutencao || ''}">
-                ${dadosOp.manutencao || ''}
+            <td>
+                ${dadosOp.manutencao ? `<span class="badge badge-red" title="${dadosOp.manutencao}">${dadosOp.manutencao}</span>` : ''}
             </td>
             
             <td class="text-center">
@@ -151,16 +190,77 @@ function renderFrotaTable(filtro = "") {
         `;
         tbody.appendChild(tr);
     });
+    
     if (typeof feather !== 'undefined') feather.replace();
     if(document.getElementById('table-count')) document.getElementById('table-count').textContent = baseFixa.length;
 }
 
-// ... (Restante das funções: setupAutoFill, abrirAtualizacao, etc. permanecem iguais) ...
+// --- SALVAR DADOS NO FIREBASE ---
+async function salvarAtualizacao(event) {
+    event.preventDefault();
+    const id = document.getElementById('input-equipamento').value;
+    const operacaoNome = document.getElementById('input-operacao').value.trim();
+    
+    let codigoOp = "";
+    if (mapaOperacoes[operacaoNome]) {
+        codigoOp = mapaOperacoes[operacaoNome];
+    } else {
+        const nomeEncontrado = Object.keys(mapaOperacoes).find(key => mapaOperacoes[key] === operacaoNome);
+        if (nomeEncontrado) codigoOp = operacaoNome; 
+    }
+
+    const novosDados = {
+        operacao: operacaoNome,
+        codigo: codigoOp, 
+        os: document.getElementById('input-os').value,
+        manutencao: document.getElementById('input-manutencao').value,
+        fundo: document.getElementById('input-fundo').value,
+        fazenda: document.getElementById('input-fazenda').value,
+        implemento: document.getElementById('input-implemento').value
+    };
+
+    try {
+        const docRef = doc(db, "diario_frota", dataSelecionada);
+        await setDoc(docRef, {
+            [id]: novosDados
+        }, { merge: true });
+        
+        fecharModal();
+    } catch (e) {
+        console.error("Erro ao salvar: ", e);
+        alert("Erro ao salvar os dados.");
+    }
+}
+
+function abrirAtualizacao(id) {
+    const modal = document.getElementById('modal-atualizacao');
+    const itemBase = baseFixa.find(i => i.id === id);
+    if (!itemBase) return;
+
+    const dadosOp = dadosDiaAtual[id] || { 
+        operacao: "", codigo: itemBase.codigo, os: "", manutencao: "", fundo: "", fazenda: "", implemento: "" 
+    };
+
+    document.getElementById('input-equipamento').value = itemBase.id;
+    document.getElementById('input-fundo').value = dadosOp.fundo;
+    document.getElementById('input-fazenda').value = dadosOp.fazenda;
+    document.getElementById('input-operacao').value = dadosOp.operacao;
+    document.getElementById('input-os').value = dadosOp.os;
+    document.getElementById('input-manutencao').value = dadosOp.manutencao;
+    document.getElementById('input-implemento').value = dadosOp.implemento || '';
+
+    modal.classList.add('active');
+    
+    if(dadosOp.fundo) document.getElementById('input-fundo').dispatchEvent(new Event('input'));
+}
+
+function fecharModal() {
+    document.getElementById('modal-atualizacao').classList.remove('active');
+}
 
 function setupAutoFill() {
     const inputFundo = document.getElementById('input-fundo');
     const inputFazenda = document.getElementById('input-fazenda');
-    const inputOperacao = document.getElementById('input-operacao');
     
     if(inputFundo && inputFazenda) {
         const atualizarFazenda = () => {
@@ -176,65 +276,6 @@ function setupAutoFill() {
         inputFundo.addEventListener('input', atualizarFazenda);
         inputFundo.addEventListener('change', atualizarFazenda);
     }
-
-    // Código automático pela operação
-    // O input-codigo não existe mais visualmente, mas o cálculo é feito ao salvar
-}
-
-function abrirAtualizacao(id) {
-    const modal = document.getElementById('modal-atualizacao');
-    const itemBase = baseFixa.find(i => i.id === id);
-    if (!itemBase) return;
-
-    const registrosDoDia = dbDiario[dataSelecionada] || {};
-    const dadosOp = registrosDoDia[id] || { 
-        operacao: "", codigo: itemBase.codigo, os: "", manutencao: "", fundo: "", fazenda: "" 
-    };
-
-    document.getElementById('input-equipamento').value = itemBase.id;
-    document.getElementById('input-fundo').value = dadosOp.fundo;
-    document.getElementById('input-fazenda').value = dadosOp.fazenda;
-    document.getElementById('input-operacao').value = dadosOp.operacao;
-    document.getElementById('input-os').value = dadosOp.os;
-    document.getElementById('input-manutencao').value = dadosOp.manutencao;
-
-    modal.classList.add('active');
-    
-    if(dadosOp.fundo) document.getElementById('input-fundo').dispatchEvent(new Event('input'));
-}
-
-function fecharModal() {
-    document.getElementById('modal-atualizacao').classList.remove('active');
-}
-
-function salvarAtualizacao(event) {
-    event.preventDefault();
-    const id = document.getElementById('input-equipamento').value;
-    
-    const operacaoNome = document.getElementById('input-operacao').value.trim();
-    let codigoOp = "";
-    
-    if (mapaOperacoes[operacaoNome]) {
-        codigoOp = mapaOperacoes[operacaoNome];
-    } else {
-        const nomeEncontrado = Object.keys(mapaOperacoes).find(key => mapaOperacoes[key] === operacaoNome);
-        if (nomeEncontrado) codigoOp = operacaoNome; 
-    }
-
-    if (!dbDiario[dataSelecionada]) dbDiario[dataSelecionada] = {};
-
-    dbDiario[dataSelecionada][id] = {
-        operacao: operacaoNome,
-        codigo: codigoOp, 
-        os: document.getElementById('input-os').value,
-        manutencao: document.getElementById('input-manutencao').value,
-        fundo: document.getElementById('input-fundo').value,
-        fazenda: document.getElementById('input-fazenda').value
-    };
-
-    salvarDadosNoNavegador();
-    renderFrotaTable();
-    fecharModal();
 }
 
 function popularDatalists() {
@@ -272,16 +313,14 @@ function setupSearch() {
 function exportarExcel() {
     let csv = "data:text/csv;charset=utf-8,\uFEFF";
     csv += `RELATÓRIO DIÁRIO - DATA: ${dataSelecionada}\n`;
-    csv += "Equipamento;Código;Fundo;Fazenda;Operação;O.S.;Manutenção\n";
-
-    const registrosDoDia = dbDiario[dataSelecionada] || {};
+    csv += "Equipamento;Código;Fundo;Fazenda;Operação;Implemento;O.S.;Manutenção\n";
 
     baseFixa.forEach(item => {
-        const op = registrosDoDia[item.id] || { 
-            operacao: "", codigo: item.codigo, os: "", manutencao: "", fundo: "", fazenda: "" 
+        const op = dadosDiaAtual[item.id] || { 
+            operacao: "", codigo: item.codigo, os: "", manutencao: "", fundo: "", fazenda: "", implemento: "" 
         };
         const row = [
-            item.id, op.codigo, op.fundo, `"${op.fazenda}"`, `"${op.operacao}"`, op.os, `"${op.manutencao}"`
+            item.id, op.codigo, op.fundo, `"${op.fazenda}"`, `"${op.operacao}"`, `"${op.implemento}"`, op.os, `"${op.manutencao}"`
         ];
         csv += row.join(";") + "\n";
     });
@@ -295,22 +334,11 @@ function exportarExcel() {
     document.body.removeChild(link);
 }
 
-function baixarBackupCompleto() {
-    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dbDiario));
-    const link = document.createElement("a");
-    link.setAttribute("href", dataStr);
-    link.setAttribute("download", "backup_agrofleet.json");
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-}
-
 function updateDashboard() {
-    const registrosDoDia = dbDiario[dataSelecionada] || {};
     const total = baseFixa.length;
     let emManutencao = 0;
     
-    Object.values(registrosDoDia).forEach(op => {
+    Object.values(dadosDiaAtual).forEach(op => {
         const t = op.operacao.toLowerCase();
         if(t.includes('manutenção') || t.includes('oficina') || t.includes('mecânico')) emManutencao++;
     });
