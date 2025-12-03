@@ -2,20 +2,19 @@
 
 // Mantive sua base fixa de equipamentos
 export const baseFixa = [
-    { id: "11116", codigo: "3019" }, { id: "11118", codigo: "3005" }, { id: "11121", codigo: "1013" },
-    { id: "11125", codigo: "1031" }, { id: "11216", codigo: "1016" }, { id: "11218", codigo: "1018" },
-    { id: "11221", codigo: "3028" }, { id: "11225", codigo: "1031" }, { id: "11316", codigo: "1035" },
-    { id: "11318", codigo: "3023" }, { id: "11321", codigo: "3008" }, { id: "11324", codigo: "1020" },
-    { id: "11416", codigo: "3028" }, { id: "11418", codigo: "1073" }, { id: "11421", codigo: "1014" },
-    { id: "11424", codigo: "1073" }, { id: "11516", codigo: "3010" }, { id: "11518", codigo: "1022" },
-    { id: "11524", codigo: "1020" }, { id: "11616", codigo: "3029" }, { id: "11618", codigo: "1073" },
-    { id: "11718", codigo: "1073" }, { id: "11124", codigo: "1091" }, { id: "11224", codigo: "1090" },
-    { id: "329",   codigo: "1055" }, { id: "340",   codigo: "1078" }, { id: "527",   codigo: ""     },
-    { id: "543",   codigo: "3028" }, { id: "724",   codigo: "1016" }, { id: "726",   codigo: "3028" },
-    { id: "732",   codigo: "3029" }, { id: "50116", codigo: "1003" }, { id: "50118", codigo: "1003" },
-    { id: "60116", codigo: "3010" }, { id: "70121", codigo: "1031" }, { id: "70122", codigo: "1031" },
-    { id: "1001",  codigo: "" },     { id: "1002",  codigo: "" },     { id: "1003",  codigo: "" },
-    { id: "1004",  codigo: "" },     { id: "1005",  codigo: "" }
+    { id: "11116", codigo: "" }, { id: "11118", codigo: "" }, { id: "11121", codigo: "" },
+    { id: "11125", codigo: "" }, { id: "11216", codigo: "" }, { id: "11218", codigo: "" },
+    { id: "11221", codigo: "" }, { id: "11225", codigo: "" }, { id: "11316", codigo: "" },
+    { id: "11318", codigo: "" }, { id: "11321", codigo: "" }, { id: "11324", codigo: "" },
+    { id: "11416", codigo: "" }, { id: "11418", codigo: "" }, { id: "11421", codigo: "" },
+    { id: "11424", codigo: "" }, { id: "11516", codigo: "" }, { id: "11518", codigo: "" },
+    { id: "11524", codigo: "" }, { id: "11616", codigo: "" }, { id: "11618", codigo: "" },
+    { id: "11718", codigo: "" }, { id: "11124", codigo: "" }, { id: "11224", codigo: "" },
+    { id: "329",   codigo: "" }, { id: "340",   codigo: "" }, { id: "527",   codigo: "" },
+    { id: "543",   codigo: "" }, { id: "724",   codigo: "" }, { id: "726",   codigo: "" },
+    { id: "732",   codigo: "" }, { id: "50116", codigo: "" }, { id: "50118", codigo: "" },
+    { id: "60116", codigo: "" }, { id: "70121", codigo: "" }, { id: "70122", codigo: "" },
+    { id: "313",  codigo: "" }, 
 ];
 
 // LISTA COMPLETA DE FAZENDAS (Baseada no arquivo Base.csv)
