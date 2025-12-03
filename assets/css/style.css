@@ -169,3 +169,35 @@ body {
 .badge-red { background-color: #fee2e2; color: #991b1b; }
 .badge-gray { background-color: #f1f5f9; color: #64748b; }
 
+/* ... (Mantenha o CSS existente acima) ... */
+
+/* --- TOAST --- */
+.toast {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: #333;
+    color: white;
+    padding: 12px 24px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.3s ease;
+    z-index: 1000;
+    font-size: 0.9rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.toast.show { opacity: 1; transform: translateY(0); }
+.toast.success { background: #10b981; border-left: 4px solid #065f46; }
+.toast.error { background: #ef4444; border-left: 4px solid #7f1d1d; }
+
+/* --- TABELA CORES --- */
+.row-status-operando { background-color: #f0fdf4; border-left: 4px solid #10b981; }
+.row-status-operando:hover { background-color: #dcfce7 !important; }
+.row-status-manutencao { background-color: #fef2f2; border-left: 4px solid #ef4444; }
+.row-status-manutencao:hover { background-color: #fee2e2 !important; }
+.row-status-neutro { border-left: 4px solid #cbd5e1; }

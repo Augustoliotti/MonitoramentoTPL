@@ -1,23 +1,71 @@
 // Arquivo: js/data/constants.js
 
-// Mantive sua base fixa de equipamentos
+// LISTA DE EQUIPAMENTOS (Atualizada conforme a imagem enviada)
 export const baseFixa = [
+    // Equipamentos numéricos pequenos
+    { id: "1", codigo: "" }, { id: "2", codigo: "" }, { id: "3", codigo: "" },
+    { id: "4", codigo: "" }, { id: "5", codigo: "" },
+    // Série 11...
     { id: "11116", codigo: "" }, { id: "11118", codigo: "" }, { id: "11121", codigo: "" },
-    { id: "11125", codigo: "" }, { id: "11216", codigo: "" }, { id: "11218", codigo: "" },
-    { id: "11221", codigo: "" }, { id: "11225", codigo: "" }, { id: "11316", codigo: "" },
-    { id: "11318", codigo: "" }, { id: "11321", codigo: "" }, { id: "11324", codigo: "" },
-    { id: "11416", codigo: "" }, { id: "11418", codigo: "" }, { id: "11421", codigo: "" },
-    { id: "11424", codigo: "" }, { id: "11516", codigo: "" }, { id: "11518", codigo: "" },
-    { id: "11524", codigo: "" }, { id: "11616", codigo: "" }, { id: "11618", codigo: "" },
-    { id: "11718", codigo: "" }, { id: "11124", codigo: "" }, { id: "11224", codigo: "" },
-    { id: "329",   codigo: "" }, { id: "340",   codigo: "" }, { id: "527",   codigo: "" },
-    { id: "543",   codigo: "" }, { id: "724",   codigo: "" }, { id: "726",   codigo: "" },
-    { id: "732",   codigo: "" }, { id: "50116", codigo: "" }, { id: "50118", codigo: "" },
-    { id: "60116", codigo: "" }, { id: "70121", codigo: "" }, { id: "70122", codigo: "" },
-    { id: "313",  codigo: "" }, 
+    { id: "11124", codigo: "" }, { id: "11125", codigo: "" }, { id: "11216", codigo: "" },
+    { id: "11218", codigo: "" }, { id: "11221", codigo: "" }, { id: "11224", codigo: "" },
+    { id: "11225", codigo: "" }, { id: "11316", codigo: "" }, { id: "11318", codigo: "" },
+    { id: "11321", codigo: "" }, { id: "11324", codigo: "" }, { id: "11416", codigo: "" },
+    { id: "11418", codigo: "" }, { id: "11421", codigo: "" }, { id: "11424", codigo: "" },
+    { id: "11516", codigo: "" }, { id: "11518", codigo: "" }, { id: "11524", codigo: "" },
+    { id: "11616", codigo: "" }, { id: "11618", codigo: "" }, { id: "11718", codigo: "" },
+    // Tratores e Caminhões diversos
+    { id: "313", codigo: "" }, { id: "329", codigo: "" }, { id: "340", codigo: "" },
+    { id: "527", codigo: "" }, { id: "543", codigo: "" }, { id: "724", codigo: "" },
+    { id: "726", codigo: "" }, { id: "732", codigo: "" },
+    // Série 50..., 60..., 70...
+    { id: "50116", codigo: "" }, { id: "50118", codigo: "" },
+    { id: "60116", codigo: "" }, { id: "60118", codigo: "" }, 
+    { id: "60120", codigo: "" }, { id: "60121", codigo: "" },
+    { id: "70121", codigo: "" }, { id: "70122", codigo: "" }
 ];
 
-// LISTA COMPLETA DE FAZENDAS (Baseada no arquivo Base.csv)
+// MAPA DE GRUPOS E LÍDERES (Conforme a tabela da imagem)
+export const mapaGrupos = {
+    "Preparo": {
+        lider: "Gerson",
+        equipamentos: ["11116", "11121", "11216", "11318", "11321", "11421", "724"]
+    },
+    "HerbPlus": {
+        lider: "Luis Alfredo",
+        equipamentos: ["11125", "11225", "340"]
+    },
+    "Catação Química": {
+        lider: "Luis Alfredo",
+        equipamentos: ["11324", "11524", "11618", "11124", "11224", "5"]
+    },
+    "Corte Soqueira": {
+        lider: "Luis Alfredo",
+        equipamentos: ["2", "3", "11424", "11718"]
+    },
+    "Cultivo": {
+        lider: "Luis Alfredo",
+        equipamentos: ["11518"]
+    },
+    "Herbicida": {
+        lider: "Luis Alfredo",
+        equipamentos: ["4", "70122", "70121"]
+    },
+    "Linha Amarela": {
+        lider: "Gerson / Bagaço", 
+        equipamentos: ["313", "329", "527", "543", "50116", "50118", "60116", "60118", "60120", "60121"]
+    },
+    "Aplicação Mista": {
+        lider: "-",
+        equipamentos: ["1"]
+    },
+    "Outros / Sem Grupo": {
+        lider: "-",
+        equipamentos: ["11118", "11218", "11221", "11316", "11416", "11418", "11516", "11616", "726", "732"]
+    }
+};
+
+// LISTA COMPLETA DE FAZENDAS (Restaurada do original)
 export const mapaFundos = {
     "30001": "30001-SITIO ESTIVA PALMITAL",
     "30101": "30101-SITIO MARINHA",
@@ -965,7 +1013,7 @@ export const mapaFundos = {
     "39002": "SITIO SÃO PEDRO"
 };
 
-// LISTA COMPLETA DE OPERAÇÕES (Baseada no arquivo operação...csv e Base.csv)
+// LISTA COMPLETA DE OPERAÇÕES
 export const mapaOperacoes = {
     "Aguardando Ordem": "3005",
     "Aguardando Prancha": "3006",

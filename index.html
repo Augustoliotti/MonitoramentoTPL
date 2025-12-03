@@ -4,23 +4,132 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AgroFleet | Dashboard</title>
-    
     <link rel="stylesheet" href="assets/css/style.css">
-    
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
-    
     <script src="components/navbar.js"></script>
     <script src="components/sidebar.js"></script>
 </head>
-<body class="flex h-screen overflow-hidden">
-    <custom-sidebar class="z-20"></custom-sidebar>
-    <div class="flex-1 flex flex-col h-full relative">
-        <custom-navbar class="z-10"></custom-navbar>
-        <main class="flex-1 p-6 md:p-10 overflow-y-auto">
-            </main>
-    </div>
+<body class="flex h-screen overflow-hidden bg-slate-50">
     
+    <div id="login-overlay" class="fixed inset-0 z-50 bg-slate-100 flex items-center justify-center">
+        <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md border border-slate-200">
+            <div class="flex flex-col items-center mb-6">
+                <div class="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-600 mb-3">
+                    <i data-feather="lock" class="w-6 h-6"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-slate-800">Acesso Restrito</h2>
+                <p class="text-sm text-slate-500">Faça login para gerenciar a frota</p>
+            </div>
+            
+            <form id="form-login" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Email</label>
+                    <input type="email" id="login-email" class="input-modern w-full" placeholder="seu@email.com" required>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Senha</label>
+                    <input type="password" id="login-senha" class="input-modern w-full" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="btn-modern btn-primary w-full py-3 justify-center text-base shadow-lg shadow-emerald-200">
+                    Entrar no Sistema
+                </button>
+            </form>
+            <p id="login-erro" class="text-red-500 text-xs text-center mt-4 hidden"></p>
+        </div>
+    </div>
+
+    <div id="app-container" class="flex h-full w-full opacity-0 transition-opacity duration-500">
+        <custom-sidebar class="z-20"></custom-sidebar>
+        <div class="flex-1 flex flex-col h-full relative">
+            <custom-navbar class="z-10"></custom-navbar>
+            
+            <main class="flex-1 p-6 md:p-8 overflow-y-auto">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+                    <div>
+                        <h1 class="text-2xl font-bold text-slate-800">Dashboard Logístico</h1>
+                        <p class="text-sm text-slate-500">Visão geral das frentes de trabalho.</p>
+                    </div>
+                    
+                    <div class="flex flex-wrap items-center gap-3">
+                        <button onclick="logoutApp()" class="btn-modern text-red-500 border border-red-100 hover:bg-red-50 text-sm">
+                            <i data-feather="log-out" class="w-4 h-4"></i> Sair
+                        </button>
+                        
+                        <div class="h-8 w-px bg-slate-200 hidden md:block"></div>
+
+                        <button onclick="abrirConfigGrupos()" class="btn-modern bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 hover:text-emerald-600 shadow-sm text-sm">
+                            <i data-feather="settings" class="w-4 h-4"></i> Configurar
+                        </button>
+
+                        <div class="bg-white px-3 py-1.5 rounded-lg border border-slate-200 shadow-sm flex items-center gap-2">
+                            <span class="block text-[10px] text-slate-400 font-bold uppercase">OP</span>
+                            <span id="dash-total-operando" class="text-sm font-bold text-slate-700">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="container-logistico" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"></div>
+            </main>
+        </div>
+    </div>
+
+    <div id="modal-atualizacao" class="modal">
+        <div class="modal-content">
+            <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50 rounded-t-lg">
+                <h3 class="text-lg font-bold text-slate-800">Apontamento</h3>
+                <button onclick="fecharModal()" class="text-slate-400 hover:text-red-500"><i data-feather="x"></i></button>
+            </div>
+            <form id="form-atualizacao" class="p-6 space-y-6">
+                <div class="flex items-center justify-between p-4 bg-emerald-50 border border-emerald-100 rounded-lg">
+                    <div class="flex items-center gap-4">
+                        <i data-feather="truck" class="text-emerald-600 w-6 h-6"></i>
+                        <div>
+                            <p class="text-xs font-bold text-emerald-600 uppercase">Equipamento</p>
+                            <input id="input-equipamento" type="text" readonly class="bg-transparent text-2xl font-bold w-full outline-none">
+                        </div>
+                    </div>
+                </div>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase">Operação</label>
+                        <input id="input-busca-operacao" type="text" list="lista-operacoes" class="input-modern" placeholder="Buscar...">
+                        <input type="hidden" id="input-operacao">
+                        <datalist id="lista-operacoes"></datalist>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <input id="input-busca-fundo" list="lista-fundos-sugestao" class="input-modern" placeholder="Fundo...">
+                        <input id="input-os" class="input-modern" placeholder="O.S.">
+                        <datalist id="lista-fundos-sugestao"></datalist>
+                        <input type="hidden" id="input-fundo">
+                        <input type="hidden" id="input-fazenda">
+                        <input type="hidden" id="input-implemento">
+                    </div>
+                    <input id="input-manutencao" class="input-modern text-red-600" placeholder="Manutenção...">
+                </div>
+                <div class="pt-4 border-t flex justify-end gap-3">
+                    <button type="button" onclick="fecharModal()" class="btn-modern btn-secondary">Cancelar</button>
+                    <button type="submit" class="btn-modern btn-primary">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="modal-config-grupos" class="modal">
+        <div class="modal-content" style="max-width: 800px;">
+            <div class="px-6 py-4 border-b flex justify-between items-center">
+                <h3 class="font-bold">Configurar Frentes</h3>
+                <button onclick="document.getElementById('modal-config-grupos').classList.remove('active')"><i data-feather="x"></i></button>
+            </div>
+            <div id="container-config-grupos" class="p-6 space-y-6 max-h-[70vh] overflow-y-auto"></div>
+            <div class="px-6 py-4 border-t flex justify-end gap-3">
+                <button onclick="salvarConfigGrupos()" class="btn-modern btn-primary">Salvar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast-notification" class="toast"></div>
+
     <script type="module" src="js/main.js"></script>
     <script>feather.replace()</script>
 </body>
