@@ -4,64 +4,99 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AgroFleet | Configurações</title>
-    <link rel="stylesheet" href="style.css">
+    
+    <link rel="stylesheet" href="assets/css/style.css">
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    
     <script src="components/navbar.js"></script>
     <script src="components/sidebar.js"></script>
 </head>
 <body class="flex h-screen overflow-hidden bg-slate-50">
     <custom-sidebar class="z-20"></custom-sidebar>
 
-    <div class="flex-1 flex flex-col h-full relative">
+    <div id="app-container" class="flex-1 flex flex-col h-full relative">
         <custom-navbar class="z-10"></custom-navbar>
         
-        <main class="flex-1 p-6 overflow-y-auto">
-            <h1 class="text-2xl font-bold text-slate-800 mb-6">Configurações do Sistema</h1>
+        <main class="flex-1 p-6 md:p-8 overflow-y-auto">
+            <h1 class="text-2xl font-bold text-slate-800 mb-2">Configurações do Sistema</h1>
+            <p class="text-slate-500 text-sm mb-8">Gerencie os cadastros base da frota.</p>
 
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div class="card-modern p-6 bg-white">
-                    <h3 class="text-lg font-bold text-slate-700 mb-4 border-b pb-2">Preferências Gerais</h3>
-                    
-                    <div class="space-y-4">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="font-medium text-slate-700">Modo Escuro</p>
-                                <p class="text-xs text-slate-500">Ativar tema escuro na interface</p>
-                            </div>
-                            <button class="w-12 h-6 bg-slate-200 rounded-full relative transition-colors duration-200 focus:outline-none">
-                                <span class="absolute left-1 top-1 bg-white w-4 h-4 rounded-full shadow-sm transition-transform duration-200"></span>
-                            </button>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                
+                <div class="card-modern bg-white rounded-xl shadow-sm border border-slate-200 flex flex-col h-[500px]">
+                    <div class="p-4 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
+                        <h3 class="font-bold text-slate-700 flex items-center gap-2">
+                            <i data-feather="truck" class="w-4 h-4 text-emerald-600"></i> Equipamentos
+                        </h3>
+                        <span id="count-equip" class="text-xs bg-white px-2 py-1 rounded border border-slate-200 font-bold">0</span>
+                    </div>
+                    <div class="p-4 border-b border-slate-100">
+                        <div class="flex gap-2">
+                            <input type="text" id="novo-equip-id" placeholder="ID (Ex: 11116)" class="input-modern text-sm flex-1 uppercase">
+                            <button onclick="adicionarCadastro('equipamento')" class="btn-modern btn-primary p-2 w-10 justify-center"><i data-feather="plus"></i></button>
                         </div>
-
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="font-medium text-slate-700">Notificações por Email</p>
-                                <p class="text-xs text-slate-500">Receber relatórios diários</p>
-                            </div>
-                            <button class="w-12 h-6 bg-emerald-500 rounded-full relative transition-colors duration-200 focus:outline-none">
-                                <span class="absolute right-1 top-1 bg-white w-4 h-4 rounded-full shadow-sm transition-transform duration-200"></span>
-                            </button>
-                        </div>
+                    </div>
+                    <div class="flex-1 overflow-y-auto p-2 space-y-1" id="lista-equipamentos">
+                        <div class="text-center text-slate-400 text-xs p-4">Carregando...</div>
                     </div>
                 </div>
 
-                <div class="card-modern p-6 bg-white">
-                    <h3 class="text-lg font-bold text-slate-700 mb-4 border-b pb-2">Gerenciamento de Dados</h3>
-                    
-                    <div class="space-y-4">
-                        <div>
-                            <label class="block text-sm font-medium text-slate-700 mb-1">Limpar Histórico Local</label>
-                            <p class="text-xs text-slate-500 mb-2">Isso apagará todos os dados salvos neste navegador.</p>
-                            <button onclick="if(confirm('Tem certeza? Isso apagará tudo.')) { localStorage.clear(); location.reload(); }" class="btn-modern text-red-600 border border-red-200 hover:bg-red-50 w-full">
-                                <i data-feather="trash-2" class="w-4 h-4"></i> Limpar Tudo
-                            </button>
+                <div class="card-modern bg-white rounded-xl shadow-sm border border-slate-200 flex flex-col h-[500px]">
+                    <div class="p-4 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
+                        <h3 class="font-bold text-slate-700 flex items-center gap-2">
+                            <i data-feather="map" class="w-4 h-4 text-emerald-600"></i> Fazendas
+                        </h3>
+                        <span id="count-fazenda" class="text-xs bg-white px-2 py-1 rounded border border-slate-200 font-bold">0</span>
+                    </div>
+                    <div class="p-4 border-b border-slate-100 space-y-2">
+                        <input type="number" id="nova-fazenda-cod" placeholder="Cód (Ex: 30001)" class="input-modern text-sm w-full">
+                        <div class="flex gap-2">
+                            <input type="text" id="nova-fazenda-nome" placeholder="Nome da Fazenda" class="input-modern text-sm flex-1 uppercase">
+                            <button onclick="adicionarCadastro('fazenda')" class="btn-modern btn-primary p-2 w-10 justify-center"><i data-feather="plus"></i></button>
                         </div>
                     </div>
+                    <div class="flex-1 overflow-y-auto p-2 space-y-1" id="lista-fazendas">
+                        </div>
                 </div>
+
+                <div class="card-modern bg-white rounded-xl shadow-sm border border-slate-200 flex flex-col h-[500px]">
+                    <div class="p-4 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
+                        <h3 class="font-bold text-slate-700 flex items-center gap-2">
+                            <i data-feather="activity" class="w-4 h-4 text-emerald-600"></i> Operações
+                        </h3>
+                        <span id="count-operacao" class="text-xs bg-white px-2 py-1 rounded border border-slate-200 font-bold">0</span>
+                    </div>
+                    <div class="p-4 border-b border-slate-100 space-y-2">
+                        <input type="text" id="nova-operacao-cod" placeholder="Cód (Ex: 3005)" class="input-modern text-sm w-full">
+                        <div class="flex gap-2">
+                            <input type="text" id="nova-operacao-nome" placeholder="Nome da Operação" class="input-modern text-sm flex-1">
+                            <button onclick="adicionarCadastro('operacao')" class="btn-modern btn-primary p-2 w-10 justify-center"><i data-feather="plus"></i></button>
+                        </div>
+                    </div>
+                    <div class="flex-1 overflow-y-auto p-2 space-y-1" id="lista-operacoes">
+                        </div>
+                </div>
+
             </div>
+            
+            <div class="mt-8 p-4 bg-red-50 border border-red-100 rounded-lg flex items-center justify-between">
+                <div>
+                    <h4 class="font-bold text-red-800 text-sm">Zona de Perigo</h4>
+                    <p class="text-xs text-red-600">Limpar dados locais do navegador. Use se o sistema apresentar erros.</p>
+                </div>
+                <button onclick="if(confirm('Tem certeza? Isso apagará o cache local e recarregará a página.')) { localStorage.clear(); location.reload(); }" class="btn-modern bg-white border border-red-200 text-red-600 text-xs hover:bg-red-100 shadow-sm">
+                    <i data-feather="trash-2" class="w-3 h-3 mr-1"></i> Limpar Cache
+                </button>
+            </div>
+
         </main>
+        
+        <div id="toast-notification" class="toast"></div>
     </div>
+
+    <script type="module" src="js/main.js"></script>
     <script>feather.replace()</script>
 </body>
 </html>

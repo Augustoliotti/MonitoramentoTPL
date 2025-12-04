@@ -11,7 +11,7 @@
     --white: #ffffff;
     --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
     --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-    --radius: 0.75rem;        /* Bordas mais arredondadas */
+    --radius: 0.75rem;        /* Bordas arredondadas */
 }
 
 body {
@@ -72,7 +72,7 @@ body {
 }
 
 .table-modern tbody td {
-    padding: 14px 20px;
+    padding: 12px 20px;
     border-bottom: 1px solid var(--border);
     color: var(--text-main);
     vertical-align: middle;
@@ -80,6 +80,40 @@ body {
 
 .table-modern tbody tr:last-child td { border-bottom: none; }
 .table-modern tbody tr:hover { background-color: #f8fafc; }
+
+/* --- STATUS BADGES --- */
+.badge {
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+}
+.badge-green { background-color: #dcfce7; color: #166534; }
+.badge-red { background-color: #fee2e2; color: #991b1b; }
+.badge-gray { background-color: #f1f5f9; color: #64748b; }
+
+/* --- CORES DE STATUS DA LINHA (Visualização Rápida) --- */
+.row-status-operando {
+    background-color: #f0fdf4; /* Verde bem claro */
+    border-left: 4px solid #10b981;
+}
+.row-status-operando:hover {
+    background-color: #dcfce7 !important;
+}
+
+.row-status-manutencao {
+    background-color: #fef2f2; /* Vermelho bem claro */
+    border-left: 4px solid #ef4444;
+}
+.row-status-manutencao:hover {
+    background-color: #fee2e2 !important;
+}
+
+.row-status-neutro {
+    border-left: 4px solid #cbd5e1; /* Cinza */
+}
 
 /* --- INPUTS & FORMULÁRIOS --- */
 .input-modern {
@@ -128,26 +162,45 @@ body {
 }
 .btn-secondary:hover { background-color: #f8fafc; border-color: #cbd5e1; }
 
-/* --- MODAL --- */
+/* --- MODAL CENTRALIZADO (Correção) --- */
 .modal {
     display: none; 
     position: fixed; 
-    z-index: 100; 
-    left: 0; top: 0; 
-    width: 100%; height: 100%; 
-    background-color: rgba(15, 23, 42, 0.4); /* Backdrop blur dark */
+    z-index: 9999; 
+    left: 0; 
+    top: 0; 
+    width: 100%; 
+    height: 100%; 
+    background-color: rgba(15, 23, 42, 0.5); /* Fundo escuro semitransparente */
     backdrop-filter: blur(4px);
-    align-items: center; justify-content: center;
+    
+    /* Centralização Flexbox */
+    align-items: center; 
+    justify-content: center;
+    overflow: hidden; 
 }
-.modal.active { display: flex; animation: fadeIn 0.2s ease-out; }
+
+.modal.active { 
+    display: flex !important; /* Força o Flex para centralizar */
+    animation: fadeIn 0.2s ease-out; 
+}
 
 .modal-content {
     background-color: var(--white);
     border-radius: 1rem;
-    width: 95%; max-width: 650px;
+    width: 95%; 
+    max-width: 650px;
     box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-    animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     border: 1px solid var(--border);
+    animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    
+    /* Scroll interno apenas */
+    max-height: 90vh;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    margin: 0 auto; /* Garante margem segura */
+    position: relative;
 }
 
 @keyframes slideUp {
@@ -156,22 +209,7 @@ body {
 }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-/* --- STATUS BADGES --- */
-.badge {
-    padding: 4px 10px;
-    border-radius: 20px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.025em;
-}
-.badge-green { background-color: #dcfce7; color: #166534; }
-.badge-red { background-color: #fee2e2; color: #991b1b; }
-.badge-gray { background-color: #f1f5f9; color: #64748b; }
-
-/* ... (Mantenha o CSS existente acima) ... */
-
-/* --- TOAST --- */
+/* --- NOTIFICAÇÕES TOAST --- */
 .toast {
     position: fixed;
     bottom: 20px;
@@ -184,7 +222,7 @@ body {
     opacity: 0;
     transform: translateY(20px);
     transition: all 0.3s ease;
-    z-index: 1000;
+    z-index: 10000; /* Acima de tudo */
     font-size: 0.9rem;
     font-weight: 500;
     display: flex;
@@ -195,9 +233,23 @@ body {
 .toast.success { background: #10b981; border-left: 4px solid #065f46; }
 .toast.error { background: #ef4444; border-left: 4px solid #7f1d1d; }
 
-/* --- TABELA CORES --- */
-.row-status-operando { background-color: #f0fdf4; border-left: 4px solid #10b981; }
-.row-status-operando:hover { background-color: #dcfce7 !important; }
-.row-status-manutencao { background-color: #fef2f2; border-left: 4px solid #ef4444; }
-.row-status-manutencao:hover { background-color: #fee2e2 !important; }
-.row-status-neutro { border-left: 4px solid #cbd5e1; }
+/* --- CUSTOMIZAÇÃO DO CALENDÁRIO (FLATPICKR) --- */
+.flatpickr-calendar {
+    border-radius: 12px !important;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+    border: 1px solid #e2e8f0 !important;
+    font-family: 'Inter', sans-serif !important;
+    padding: 10px !important;
+    z-index: 10000 !important; /* Garante que fique acima de modais se necessário */
+}
+.flatpickr-calendar.arrowTop:before, .flatpickr-calendar.arrowTop:after { border-bottom-color: #e2e8f0 !important; }
+.flatpickr-months .flatpickr-month { height: 40px !important; background: transparent !important; color: #1e293b !important; fill: #1e293b !important; }
+.flatpickr-current-month .flatpickr-monthDropdown-months { font-weight: 700 !important; font-size: 15px !important; }
+.flatpickr-weekdays { margin-bottom: 10px !important; }
+span.flatpickr-weekday { color: #64748b !important; font-weight: 600 !important; font-size: 12px !important; }
+.flatpickr-day { border-radius: 8px !important; color: #334155 !important; font-weight: 500 !important; transition: all 0.2s !important; }
+.flatpickr-day.today { border-color: #10b981 !important; color: #10b981 !important; }
+.flatpickr-day.selected, .flatpickr-day.startRange, .flatpickr-day.endRange, .flatpickr-day.selected.inRange, .flatpickr-day.startRange.inRange, .flatpickr-day.endRange.inRange, .flatpickr-day.selected:focus, .flatpickr-day.startRange:focus, .flatpickr-day.endRange:focus, .flatpickr-day.selected:hover, .flatpickr-day.startRange:hover, .flatpickr-day.endRange:hover {
+    background: #10b981 !important; border-color: #10b981 !important; color: white !important; box-shadow: 0 4px 6px rgba(16, 185, 129, 0.3) !important;
+}
+.flatpickr-day:hover { background: #d1fae5 !important; border-color: #d1fae5 !important; }

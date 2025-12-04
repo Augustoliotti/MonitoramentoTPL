@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acesso ao Painel</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="login.css">
+</head>
+<body id="login-body">
+    
+    <div id="login-container">
+        <div class="login-container">
+            <div class="login-card">
+                <div class="login-header">
+                    <div class="logo">
+                        <i class="fas fa-rocket"></i>
+                    </div>
+                    <h1>Login</h1>
+                    <p>Entre na sua conta para continuar</p>
+                </div>
+
+                <form class="login-form" id="loginForm">
+                    <div class="form-group">
+                        <label for="email">E-mail</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-envelope"></i>
+                            <input type="email" id="email" placeholder="exemplo@email.com" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Senha</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-lock"></i>
+                            <input type="password" id="password" placeholder="******" required>
+                            <button type="button" class="toggle-password" id="togglePasswordBtn">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <p id="loginError" class="error-message" style="display: none; text-align: center; margin-bottom: 15px;"></p>
+
+                    <button type="submit" class="login-btn" id="loginBtn">
+                        <span>Entrar</span>
+                    </button>
+                </form>
+            </div>
+
+            <div class="login-illustration">
+                <div class="illustration-content">
+                    <img src="https://usinapitangueiras.com.br/wp-content/uploads/2020/04/usina-pitangueiras-logo.png" 
+                         alt="Logo" class="illustration-logo">
+                    <h2>Portal Admin</h2>
+                    <p>Gerenciamento completo em um só lugar.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="login.js"></script>
+</body>
+</html>
