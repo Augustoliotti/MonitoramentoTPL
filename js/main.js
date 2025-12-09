@@ -49,6 +49,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     window.exportarExcel = exportarExcel;
     window.adicionarCadastro = adicionarCadastro;
     window.removerCadastro = removerCadastro;
+    // NOVAS FUNÇÕES EXPORTADAS PARA O MODAL DE GRUPOS
+    window.adicionarEquipamentoAoGrupo = adicionarEquipamentoAoGrupo;
+    window.removerEquipamentoDoGrupo = removerEquipamentoDoGrupo;
+    
     window.logoutApp = async () => {
         await logout();
         window.location.href = 'login/login.html';
@@ -133,7 +137,9 @@ function iniciarSistema() {
             gruposAtivos = config;
             if(document.getElementById('container-logistico')) renderizarQuadroLogistico();
             if(document.getElementById('filtro-grupo')) popularFiltroGrupos();
-            if(document.getElementById('modal-config-grupos')?.classList.contains('active')) abrirConfigGrupos();
+            
+            // ATUALIZA O MODAL DE GRUPOS SE ESTIVER ABERTO
+            if(document.getElementById('modal-config-grupos')?.classList.contains('active')) renderizarConfigGruposModal();
         }
     });
 
@@ -447,7 +453,144 @@ function gerarCard(nome, lider, ids, alert = false) {
     return `<div class="card-modern rounded-xl shadow-sm border overflow-hidden flex flex-col border-slate-200 bg-white"><div class="px-4 py-3 border-b flex justify-between items-center bg-slate-50"><div><h3 class="font-bold text-sm uppercase">${nome}</h3><p class="text-xs text-slate-500">${lider}</p></div><div class="text-[10px] font-bold text-right"><span class="text-emerald-600">OP:${op}</span> <span class="text-red-600 ml-1">MN:${mn}</span></div></div><div class="p-3 grid grid-cols-4 gap-2 bg-white flex-1">${items}</div></div>`;
 }
 
-// FUNÇÕES DE CONFIGURAÇÃO (STUBS IMPLEMENTADOS)
+// =================================================================
+// NOVO CÓDIGO: FUNÇÕES DE CONFIGURAÇÃO DE GRUPOS (CONFIGURAR FRENTES)
+// =================================================================
+
+function gerarInputEquipamento(id, grupoNome) {
+    // Renderiza um tag com o ID do equipamento e um botão para remover do grupo
+    return `<div class="bg-white px-3 py-1 rounded-lg border border-slate-200 flex items-center justify-between text-sm font-bold text-slate-700">
+                <span>${id}</span>
+                <button type="button" onclick="removerEquipamentoDoGrupo('${grupoNome}', '${id}')" class="text-red-500 hover:text-red-700 p-1 rounded-full hover:bg-red-50 transition"><i data-feather="x" class="w-4 h-4"></i></button>
+            </div>`;
+}
+
+function renderizarConfigGruposModal() {
+    const container = document.getElementById('container-config-grupos');
+    if (!container) return;
+
+    let html = '';
+    const todosEquipamentos = listaEquipamentos.map(e => e.id);
+    const usados = new Set();
+    
+    // Renderiza os grupos existentes
+    for (const [nome, info] of Object.entries(gruposAtivos)) {
+        info.equipamentos.forEach(id => usados.add(id));
+        
+        // Ordena os equipamentos para melhor visualização
+        (info.equipamentos || []).sort((a,b) => a.localeCompare(b, undefined, {numeric: true}));
+        
+        const listaEquip = (info.equipamentos || []).map(id => gerarInputEquipamento(id, nome)).join('');
+
+        html += `
+            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                <div class="flex justify-between items-center mb-4">
+                    <h4 class="font-bold text-slate-800">${nome}</h4>
+                    <input type="text" value="${info.lider || ''}" placeholder="Líder" class="input-modern w-32 text-xs py-1 px-2 border-slate-200" data-group="${nome}" data-field="lider">
+                </div>
+                <div class="grid grid-cols-5 gap-2 border-t pt-4" id="lista-equipamentos-grupo-${nome}">
+                    ${listaEquip}
+                </div>
+                <div class="flex gap-2 mt-4">
+                    <input type="text" placeholder="Adicionar Equipamento (ID)" class="input-modern flex-1 text-sm uppercase" id="input-add-equip-${nome}">
+                    <button type="button" onclick="adicionarEquipamentoAoGrupo('${nome}')" class="btn-modern btn-primary p-2 w-10 justify-center text-sm"><i data-feather="plus" class="w-4 h-4"></i></button>
+                </div>
+            </div>
+        `;
+    }
+    
+    // Adicionar seção de equipamentos sem grupo
+    const orfaos = todosEquipamentos.filter(id => !usados.has(id));
+    if (orfaos.length > 0) {
+         const listaOrfaos = orfaos.map(id => 
+            `<div class="bg-red-50 px-3 py-1 rounded-lg border border-red-200 flex items-center justify-between text-xs font-bold text-red-700"><span>${id}</span></div>`
+         ).join('');
+         
+         html += `
+            <div class="bg-red-50 p-5 rounded-xl border border-red-200 shadow-sm mt-6">
+                <h4 class="font-bold text-red-800 mb-4">Equipamentos Sem Frente (${orfaos.length})</h4>
+                <div class="grid grid-cols-5 gap-2">
+                    ${listaOrfaos}
+                </div>
+                <p class="text-xs text-red-600 mt-4">Estes IDs não estão alocados em nenhuma frente.</p>
+            </div>
+         `;
+    }
+
+
+    container.innerHTML = html;
+    if (typeof feather !== 'undefined') feather.replace();
+}
+
+function adicionarEquipamentoAoGrupo(groupName) {
+    const input = document.getElementById(`input-add-equip-${groupName}`);
+    const id = input.value.trim().toUpperCase();
+    if (!id) return mostrarToast("Digite o ID do equipamento", "error");
+    if (!listaEquipamentos.some(e => e.id === id)) return mostrarToast(`Equipamento ${id} não está na lista base. Adicione em Configurações.`, "error");
+    
+    // Remove o equipamento de outros grupos antes de adicionar
+    Object.values(gruposAtivos).forEach(g => {
+        g.equipamentos = g.equipamentos.filter(e => e !== id);
+    });
+
+    const grupo = gruposAtivos[groupName];
+    if (grupo && !grupo.equipamentos.includes(id)) {
+        grupo.equipamentos.push(id);
+        grupo.equipamentos.sort((a,b) => a.localeCompare(b, undefined, {numeric: true}));
+        mostrarToast(`Equipamento ${id} adicionado. Clique em Salvar.`, "success");
+        input.value = '';
+        renderizarConfigGruposModal(); 
+    } else if (grupo && grupo.equipamentos.includes(id)) {
+         mostrarToast(`Equipamento ${id} já está neste grupo.`, "error");
+    }
+}
+
+function removerEquipamentoDoGrupo(groupName, id) {
+    const grupo = gruposAtivos[groupName];
+    if (grupo) {
+        grupo.equipamentos = grupo.equipamentos.filter(e => e !== id);
+        mostrarToast(`Equipamento ${id} removido. Clique em Salvar.`, "success");
+        renderizarConfigGruposModal(); 
+    }
+}
+
+function abrirConfigGrupos() { 
+    renderizarConfigGruposModal(); // Carrega o conteúdo dinâmico
+    document.getElementById('modal-config-grupos').classList.add('active'); 
+}
+
+async function salvarConfigGrupos() { 
+    // 1. Captura o líder de cada grupo antes de salvar
+    document.querySelectorAll('[data-group][data-field="lider"]').forEach(input => {
+        const groupName = input.getAttribute('data-group');
+        gruposAtivos[groupName].lider = input.value.trim();
+    });
+
+    try {
+        // 2. Salva o estado atual de gruposAtivos no Firebase
+        await salvarConfiguracaoGrupos(gruposAtivos);
+        mostrarToast("Configuração de Frentes salva com sucesso!", "success"); 
+        // 3. Fecha o modal (a re-renderização do Dashboard será feita pelo listener de mudanças)
+        document.getElementById('modal-config-grupos').classList.remove('active'); 
+    } catch(e) {
+        console.error("Erro ao salvar configuração de grupos:", e);
+        mostrarToast("Erro ao salvar configuração.", "error"); 
+    }
+}
+
+function resetarGruposPadrao() { 
+    if(confirm("Tem certeza que deseja restaurar as Frentes para o padrão inicial?")) {
+        salvarConfiguracaoGrupos(mapaGruposPadrao)
+            .then(() => mostrarToast("Frentes restauradas para o padrão. Clique em Salvar.", "success"))
+            .catch(() => mostrarToast("Erro ao restaurar. Tente novamente.", "error"));
+    }
+}
+// =================================================================
+// FIM DO NOVO CÓDIGO
+// =================================================================
+
+
+// Funções de Configurações Gerais (Mantidas do original)
 function exportarExcel() {
     let csv = "data:text/csv;charset=utf-8,\uFEFFEquipamento;Código;Fundo;Fazenda;Operação;Implemento;O.S.;Manutenção\n";
     listaEquipamentos.forEach(item => {
@@ -494,8 +637,3 @@ function renderConfigPage() {
         document.getElementById('count-equip').textContent = listaEquipamentos.length;
     }
 }
-
-// Funções de Grupo (Simplificadas para garantir funcionamento)
-function abrirConfigGrupos() { document.getElementById('modal-config-grupos').classList.add('active'); }
-async function salvarConfigGrupos() { mostrarToast("Função de grupos simplificada nesta versão de emergência."); }
-function resetarGruposPadrao() { salvarConfigGrupos(); }
